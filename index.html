@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>StudyVault</title>
+<meta name="description" content="StudyVault — your personal recorded class library.">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="StudyVault">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="referrer" content="strict-origin">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#0a0a0a;--accent-fg:#fafafa;--ink:#0a0a0a;--muted:#8a8a8a;--line:#e5e5e5;--page:#fafafa;
+  --logo:#000;--sub:#525252;--warm1:#ececec;--warm2:#f6f6f6;--surface:#fff;--deco:rgba(255,255,255,.7);--deco-line:rgba(0,0,0,.08);--deco-shadow:rgba(0,0,0,.18);
+  --ease:cubic-bezier(.22,1,.36,1);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--accent:#fafafa;--accent-fg:#0a0a0a;--ink:#fafafa;--muted:#6b6b6b;--line:#262626;--page:#0a0a0a;
+  --logo:#fff;--sub:#a3a3a3;--warm1:#1c1c1c;--warm2:#121212;--surface:#141414;--deco:rgba(255,255,255,.05);--deco-line:rgba(255,255,255,.1);--deco-shadow:rgba(0,0,0,.6);color-scheme:dark}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--page);overflow:hidden;overscroll-behavior:none}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+::selection{background:var(--accent);color:var(--accent-fg)}
+
+/* The site fills the whole window, inset only by device notches / home bar */
+#shell{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:var(--page)}
+#app{display:block;width:100%;height:100%;border:0;background:var(--page)}
+
+/* Splash — same layout and motion as the Saadat Library redirect page */
+#splash{position:fixed;inset:0;z-index:2;display:grid;place-items:center;padding:24px;overflow:hidden;
+  padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(24px,env(safe-area-inset-bottom));
+  background:radial-gradient(120% 90% at 50% -10%,var(--warm1) 0%,var(--warm2) 45%,var(--surface) 80%);
+  transition:opacity .35s ease,transform .35s var(--ease),visibility .35s}
+#splash.leaving{opacity:0;transform:scale(1.03);visibility:hidden;pointer-events:none}
+.deco{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.deco span{position:absolute;display:grid;place-items:center;border-radius:20px;color:var(--accent);background:var(--deco);border:1px solid var(--deco-line);box-shadow:0 14px 30px -16px var(--deco-shadow);animation:drift 7s ease-in-out infinite}
+.deco svg{width:50%;height:50%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.d1{width:58px;height:58px;left:9%;top:22%;rotate:-10deg}.d2{width:44px;height:44px;left:16%;bottom:15%;rotate:8deg;animation-delay:-2s;border-radius:15px}
+.d3{width:64px;height:64px;right:9%;top:18%;rotate:9deg;animation-delay:-4s}.d4{width:46px;height:46px;right:15%;bottom:19%;rotate:-7deg;animation-delay:-1s;border-radius:15px}
+@keyframes drift{50%{translate:0 -12px}}
+@media (max-width:900px){.deco{display:none}}
+main{position:relative;width:100%;max-width:380px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.logo{display:block;width:84px;height:84px;margin-bottom:22px;fill:var(--logo);user-select:none}
+@keyframes up{from{opacity:0;transform:translateY(14px)}}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);animation:up .6s var(--ease) .15s both}
+h1{font-size:clamp(28px,7.6vw,34px);line-height:1.12;font-weight:800;letter-spacing:-.035em;margin:8px 0 12px;text-wrap:balance;animation:up .6s var(--ease) .25s both}
+h1 em{font-style:normal;color:var(--sub)}
+.sub{font-size:15px;color:var(--sub);line-height:1.5;animation:up .6s var(--ease) .35s both}
+.bar{width:min(58%,190px);height:4px;border-radius:99px;background:var(--line);overflow:hidden;margin:30px auto 16px;animation:up .6s var(--ease) .45s both}
+.bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--muted));transition:width 0ms linear}
+.dest{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--muted);min-height:20px;animation:up .6s var(--ease) .55s both}
+.dest svg{width:13px;height:13px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.help{margin-top:26px;opacity:0;visibility:hidden;transform:translateY(8px);transition:all .5s var(--ease)}
+.help.show{opacity:1;visibility:visible;transform:none}
+.help p{font-size:13px;color:var(--muted);margin-bottom:12px}
+.btn{display:inline-block;font:inherit;border:0;cursor:pointer;background:var(--accent);color:var(--accent-fg);font-weight:600;font-size:15px;padding:13px 26px;border-radius:14px;
+  box-shadow:0 10px 24px -10px var(--deco-shadow);transition:transform .2s var(--ease),opacity .2s}
+.btn:hover{opacity:.88;transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* Offline / error screens reuse the same look */
+.screen{position:fixed;inset:0;z-index:3;display:grid;place-items:center;padding:24px;text-align:center;
+  background:radial-gradient(120% 90% at 50% -10%,var(--warm1) 0%,var(--warm2) 45%,var(--surface) 80%);
+  transition:opacity .35s ease,visibility .35s}
+.screen.hide{opacity:0;visibility:hidden;pointer-events:none}
+.screen main{max-width:340px}
+.screen h1{font-size:26px;margin:0 0 10px;animation:none}
+.screen .sub{animation:none}
+.screen .btn{margin-top:22px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="shell"><iframe id="app" title="StudyVault"
+  allow="publickey-credentials-get *; publickey-credentials-create *; clipboard-read; clipboard-write; fullscreen; autoplay; web-share"
+  allowfullscreen referrerpolicy="strict-origin"></iframe></div>
+
+<div id="splash" role="status" aria-live="polite">
+  <div class="deco" aria-hidden="true">
+    <span class="d1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg></span>
+    <span class="d2"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg></span>
+    <span class="d3"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+    <span class="d4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+  </div>
+  <main>
+    <svg class="logo" viewBox="0 0 640 640" aria-hidden="true"><g transform="translate(60,60) scale(0.82)"><path d="M192 448C245 448 288 491 288 544C288 561.7 273.7 576 256 576L32 576C14.3 576 0 561.7 0 544C0 491 43 448 96 448L192 448zM544 96C579.3 96 608 124.7 608 160L608 448C608 481.1 582.8 508.4 550.5 511.7L544 512L332.9 512C327.8 487.8 316.6 465.9 300.8 448L352 448L352 416C352 398.3 366.3 384 384 384L480 384C497.7 384 512 398.3 512 416L512 448L544 448L544 160L192 160L192 217.3C177.2 211.3 161 208 144 208C138.6 208 133.2 208.3 128 209L128 160C128 124.7 156.7 96 192 96L544 96zM144 416C99.8 416 64 380.2 64 336C64 291.8 99.8 256 144 256C188.2 256 224 291.8 224 336C224 380.2 188.2 416 144 416z"/></g></svg>
+    <p class="eyebrow">One moment</p>
+    <h1>Opening <em>StudyVault</em></h1>
+    <p class="sub">Your private class library.<br>Getting everything ready…</p>
+    <div class="bar" id="bar"><i></i></div>
+    <div class="dest"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span>Secure connection</span></div>
+    <div class="help" id="help"><p>Taking longer than usual?</p><button class="btn" id="retry" type="button">Try again</button></div>
+  </main>
+</div>
+
+<div class="screen hide" id="offline" role="alert">
+  <main>
+    <h1>You're offline</h1>
+    <p class="sub">Check your connection. StudyVault will reload by itself when you're back online.</p>
+    <button class="btn" type="button" id="retryOffline">Try again</button>
+  </main>
+</div>
+
+<div class="screen hide" id="error" role="alert">
+  <main>
+    <h1>Can't open StudyVault</h1>
+    <p class="sub">The app couldn't find the current address. Try again in a moment.</p>
+    <button class="btn" type="button" id="retryError">Try again</button>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "sv_target";       // last known address, kept only in this device's storage
+  var MIN_SHOW = 900;          // ms the animation plays (keeps it from flashing)
+  var SLOW = 15000;            // leave the splash after this long even if 'load' never fires
+  var $ = function(i){ return document.getElementById(i); };
+  var frame = $("app"), splash = $("splash"), offline = $("offline"), error = $("error"), help = $("help");
+  var fillEl = $("bar").firstElementChild;
+  var current = null, t0 = Date.now(), slowTimer, helpTimer, loaded = false;
+
+  function clean(u){ try { var x = new URL(u); return x.protocol === "https:" ? x.href : null; } catch(e){ return null; } }
+  function cached(){ try { return clean(localStorage.getItem(KEY)); } catch(e){ return null; } }
+  function remember(u){ try { localStorage.setItem(KEY, u); } catch(e){} }
+  function show(el, on){ el.classList.toggle("hide", !on); }
+
+  // progress bar: eases toward 90% while we wait, completes when the site has loaded
+  function fill(ms, pct){
+    void fillEl.offsetWidth;
+    fillEl.style.transition = "width " + ms + "ms " + (pct ? "cubic-bezier(.2,.7,.2,1)" : "linear");
+    fillEl.style.width = (pct || 100) + "%";
+  }
+  function resetBar(){ fillEl.style.transition = "none"; fillEl.style.width = "0"; }
+
+  function showSplash(){
+    loaded = false; t0 = Date.now();
+    splash.classList.remove("leaving"); help.classList.remove("show");
+    resetBar();
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(!loaded) fill(MIN_SHOW, 90); }); });
+    clearTimeout(helpTimer); helpTimer = setTimeout(function(){ help.classList.add("show"); }, 4000);
+    clearTimeout(slowTimer); slowTimer = setTimeout(leaveSplash, SLOW);
+  }
+  function leaveSplash(){
+    if (loaded) return; loaded = true;
+    clearTimeout(slowTimer); clearTimeout(helpTimer);
+    var wait = Math.max(0, MIN_SHOW - (Date.now() - t0));
+    fill(wait + 260);
+    setTimeout(function(){ splash.classList.add("leaving"); }, wait);
+  }
+
+  function openSite(u){
+    current = u;
+    show(error, false);
+    showSplash();
+    frame.src = u;
+  }
+
+  // Ask the server for the live address (never from HTTP cache)
+  function fetchTarget(){
+    var ctl = window.AbortController ? new AbortController() : null;
+    var t = setTimeout(function(){ ctl && ctl.abort(); }, 4000);
+    return fetch("site.json?t=" + Date.now(), { cache: "no-store", signal: ctl && ctl.signal })
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ clearTimeout(t); var u = clean(d && d.url); if(!u) throw 0; return u; })
+      .catch(function(e){ clearTimeout(t); throw e; });
+  }
+
+  function boot(){
+    if (!navigator.onLine) { show(offline, true); return; }
+    var c = cached();
+    if (c) {
+      openSite(c);                                   // instant start from the last known address
+      fetchTarget().then(function(u){                // then quietly confirm it's still the right one
+        remember(u); if (u !== current) openSite(u);
+      }).catch(function(){});
+    } else {
+      showSplash();
+      fetchTarget().then(function(u){ remember(u); openSite(u); })
+        .catch(function(){ leaveSplash(); show(error, true); });
+    }
+  }
+
+  frame.addEventListener("load", function(){ if (current) leaveSplash(); });
+
+  window.addEventListener("offline", function(){ show(offline, true); });
+  window.addEventListener("online", function(){ show(offline, false); current ? openSite(current) : boot(); });
+  $("retryOffline").addEventListener("click", function(){ if (navigator.onLine) { show(offline, false); current ? openSite(current) : boot(); } });
+  $("retryError").addEventListener("click", function(){ show(error, false); boot(); });
+  $("retry").addEventListener("click", function(){ boot(); });
+
+  // Check for a new version of the shell whenever the app comes back to the front
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) reg.update().catch(function(){}); });
+    }).catch(function(){});
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
