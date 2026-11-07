@@ -1,0 +1,38 @@
+name: Update website link
+
+# Publish (or edit) a GitHub Release whose TITLE is the new address,
+# e.g.  https://studyvault.example.com   — site.json updates itself.
+on:
+  release:
+    types: [published, edited]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: ${{ !github.event.release.prerelease && !github.event.release.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Read URL from the release
+        env:
+          TITLE: ${{ github.event.release.name }}
+          BODY: ${{ github.event.release.body }}
+        run: |
+          URL=$(printf '%s\n%s\n' "$TITLE" "$BODY" | grep -oE 'https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~%/?#&=+-]*)?' | head -n1 || true)
+          if [ -z "$URL" ]; then echo "::error::No https:// address found in the release title or description"; exit 1; fi
+          jq -n --arg url "$URL" '{url:$url}' > site.json
+          echo "New address: $URL"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site.json
+          git diff --cached --quiet && echo "No change" && exit 0
+          git commit -m "Update website link"
+          git push
+
+          
